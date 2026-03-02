@@ -2,17 +2,17 @@
 
 namespace App\Policies;
 
-use App\Models\Empresa;
+use App\Models\Plano;
 use App\Models\User;
 
-class EmpresaPolicy
+class PlanoPolicy
 {
     public function viewAny(User $user): bool
     {
         return $user->isSuperAdmin();
     }
 
-    public function view(User $user, Empresa $empresa): bool
+    public function view(User $user, Plano $plano): bool
     {
         return $user->isSuperAdmin();
     }
@@ -22,22 +22,17 @@ class EmpresaPolicy
         return $user->isSuperAdmin();
     }
 
-    public function update(User $user, Empresa $empresa): bool
+    public function update(User $user, Plano $plano): bool
     {
         return $user->isSuperAdmin();
     }
 
-    public function delete(User $user, Empresa $empresa): bool
+    public function delete(User $user, Plano $plano): bool
     {
         return $user->isSuperAdmin();
     }
 
-    public function toggleStatus(User $user, Empresa $empresa): bool
-    {
-        return $user->isSuperAdmin();
-    }
-
-    public function resetAdminAccess(User $user, Empresa $empresa): bool
+    public function toggleAtivo(User $user, Plano $plano): bool
     {
         return $user->isSuperAdmin();
     }

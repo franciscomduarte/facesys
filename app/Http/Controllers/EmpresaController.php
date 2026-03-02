@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Empresa;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class EmpresaController extends Controller
 {
@@ -62,6 +65,7 @@ class EmpresaController extends Controller
         $this->authorize('view', $empresa);
 
         $empresa->loadCount(['users', 'patients', 'procedimentos', 'agendamentos']);
+        $empresa->load('subscription.plano');
 
         return view('empresas.show', compact('empresa'));
     }
@@ -102,6 +106,28 @@ class EmpresaController extends Controller
         return redirect()
             ->route('empresas.index')
             ->with('success', 'Empresa removida com sucesso.');
+    }
+
+    public function resetAdminAccess(Empresa $empresa)
+    {
+        $this->authorize('resetAdminAccess', $empresa);
+
+        $admin = User::where('empresa_id', $empresa->id)
+            ->where('role', 'admin')
+            ->first();
+
+        if (!$admin) {
+            return redirect()
+                ->back()
+                ->with('error', 'Nenhum usuario admin encontrado para esta empresa.');
+        }
+
+        $senhaTemporaria = Str::random(12);
+        $admin->update(['password' => Hash::make($senhaTemporaria)]);
+
+        return redirect()
+            ->back()
+            ->with('success', "Senha do admin '{$admin->name}' ({$admin->email}) resetada. Senha temporaria: {$senhaTemporaria}");
     }
 
     public function toggleStatus(Empresa $empresa)

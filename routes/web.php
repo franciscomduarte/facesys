@@ -1,16 +1,21 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AgendamentoController;
 use App\Http\Controllers\AssinaturaController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ContratoController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\FotoClinicaController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PlanoController;
 use App\Http\Controllers\PrescricaoController;
 use App\Http\Controllers\TemplateContratoController;
 use App\Http\Controllers\TreatmentSessionController;
 use App\Http\Controllers\ProcedimentoController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,9 +28,8 @@ Route::post('assinar/{token}', [AssinaturaController::class, 'storeAssinaturaPac
 Route::get('verificar-documento', [AssinaturaController::class, 'verificar'])->name('assinatura.verificar');
 Route::get('verificar-documento/{hash}', [AssinaturaController::class, 'verificarHash'])->name('assinatura.verificar.hash');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     // Profile (Breeze)
@@ -122,6 +126,28 @@ Route::middleware('auth')->group(function () {
     Route::resource('empresas', EmpresaController::class);
     Route::patch('empresas/{empresa}/toggle-status', [EmpresaController::class, 'toggleStatus'])
         ->name('empresas.toggle-status');
+    Route::patch('empresas/{empresa}/reset-admin', [EmpresaController::class, 'resetAdminAccess'])
+        ->name('empresas.reset-admin');
+
+    // Activity Logs (Super Admin)
+    Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+
+    // Planos (Super Admin)
+    Route::resource('planos', PlanoController::class);
+    Route::patch('planos/{plano}/toggle-ativo', [PlanoController::class, 'toggleAtivo'])
+        ->name('planos.toggle-ativo');
+
+    // Subscriptions (Super Admin)
+    Route::resource('subscriptions', SubscriptionController::class)->except(['edit', 'update', 'destroy']);
+    Route::patch('subscriptions/{subscription}/cancelar', [SubscriptionController::class, 'cancelar'])
+        ->name('subscriptions.cancelar');
+    Route::patch('subscriptions/{subscription}/reativar', [SubscriptionController::class, 'reativar'])
+        ->name('subscriptions.reativar');
+    Route::patch('subscriptions/{subscription}/alterar-plano', [SubscriptionController::class, 'alterarPlano'])
+        ->name('subscriptions.alterar-plano');
+
+    // Meu Plano (Empresa)
+    Route::get('meu-plano', [BillingController::class, 'show'])->name('billing.show');
 });
 
 require __DIR__.'/auth.php';

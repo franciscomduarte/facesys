@@ -23,6 +23,15 @@
                         <x-nav-link :href="route('empresas.index')" :active="request()->routeIs('empresas.*')">
                             Empresas
                         </x-nav-link>
+                        <x-nav-link :href="route('planos.index')" :active="request()->routeIs('planos.*')">
+                            Planos
+                        </x-nav-link>
+                        <x-nav-link :href="route('subscriptions.index')" :active="request()->routeIs('subscriptions.*')">
+                            Subscriptions
+                        </x-nav-link>
+                        <x-nav-link :href="route('activity-logs.index')" :active="request()->routeIs('activity-logs.*')">
+                            Logs
+                        </x-nav-link>
                     @else
                         <x-nav-link :href="route('patients.index')" :active="request()->routeIs('patients.*')">
                             Pacientes
@@ -57,6 +66,11 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             Perfil
                         </x-dropdown-link>
+                        @if(!Auth::user()->isSuperAdmin())
+                            <x-dropdown-link :href="route('billing.show')">
+                                Meu Plano
+                            </x-dropdown-link>
+                        @endif
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
@@ -88,6 +102,15 @@
                 <x-responsive-nav-link :href="route('empresas.index')" :active="request()->routeIs('empresas.*')">
                     Empresas
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('planos.index')" :active="request()->routeIs('planos.*')">
+                    Planos
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('subscriptions.index')" :active="request()->routeIs('subscriptions.*')">
+                    Subscriptions
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('activity-logs.index')" :active="request()->routeIs('activity-logs.*')">
+                    Logs
+                </x-responsive-nav-link>
             @else
                 <x-responsive-nav-link :href="route('patients.index')" :active="request()->routeIs('patients.*')">
                     Pacientes
@@ -116,6 +139,11 @@
                 <x-responsive-nav-link :href="route('profile.edit')">
                     Perfil
                 </x-responsive-nav-link>
+                @if(!Auth::user()->isSuperAdmin())
+                    <x-responsive-nav-link :href="route('billing.show')">
+                        Meu Plano
+                    </x-responsive-nav-link>
+                @endif
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <x-responsive-nav-link :href="route('logout')"

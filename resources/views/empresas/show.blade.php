@@ -30,6 +30,12 @@
                 </div>
             @endif
 
+            @if(session('error'))
+                <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-6">
                     <x-clinic-card title="Dados da Empresa">
@@ -92,17 +98,76 @@
                         </dl>
                     </x-clinic-card>
 
-                    <x-confirm-modal
-                        :action="route('empresas.destroy', $empresa)"
-                        title="Remover Empresa"
-                        message="Tem certeza que deseja remover esta empresa? Todos os dados associados serao mantidos mas a empresa ficara inativa."
-                        confirmText="Remover">
-                        <x-slot name="trigger">
-                            <button type="button" class="w-full text-center px-4 py-2 bg-red-50 text-red-600 rounded-md hover:bg-red-100 text-sm">
-                                Remover Empresa
-                            </button>
-                        </x-slot>
-                    </x-confirm-modal>
+                    <x-clinic-card title="Subscription">
+                        @if($empresa->subscription)
+                            <dl class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <dt class="text-sm text-gray-500">Plano</dt>
+                                    <dd class="text-sm font-semibold text-gray-900">{{ $empresa->subscription->plano->nome }}</dd>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <dt class="text-sm text-gray-500">Status</dt>
+                                    <dd>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                                            {{ $empresa->subscription->status === 'ativa' ? 'bg-green-100 text-green-800' : '' }}
+                                            {{ $empresa->subscription->status === 'trial' ? 'bg-blue-100 text-blue-800' : '' }}
+                                            {{ $empresa->subscription->status === 'inadimplente' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                            {{ $empresa->subscription->status === 'cancelada' ? 'bg-red-100 text-red-800' : '' }}
+                                            {{ $empresa->subscription->status === 'expirada' ? 'bg-gray-100 text-gray-800' : '' }}">
+                                            {{ ucfirst($empresa->subscription->status) }}
+                                        </span>
+                                    </dd>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <dt class="text-sm text-gray-500">Valor</dt>
+                                    <dd class="text-sm text-gray-900">{{ $empresa->subscription->valor_atual_formatado }}</dd>
+                                </div>
+                                @if($empresa->subscription->proxima_cobranca)
+                                    <div class="flex items-center justify-between">
+                                        <dt class="text-sm text-gray-500">Proxima cobranca</dt>
+                                        <dd class="text-sm text-gray-900">{{ $empresa->subscription->proxima_cobranca->format('d/m/Y') }}</dd>
+                                    </div>
+                                @endif
+                            </dl>
+                            <div class="mt-3">
+                                <a href="{{ route('subscriptions.show', $empresa->subscription) }}" class="text-sm text-indigo-600 hover:text-indigo-900">Ver detalhes &rarr;</a>
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500">Sem subscription ativa.</p>
+                            <div class="mt-3">
+                                <a href="{{ route('subscriptions.create') }}" class="text-sm text-indigo-600 hover:text-indigo-900">Criar subscription &rarr;</a>
+                            </div>
+                        @endif
+                    </x-clinic-card>
+
+                    <x-clinic-card title="Acoes">
+                        <div class="space-y-3">
+                            <x-confirm-modal
+                                :action="route('empresas.reset-admin', $empresa)"
+                                method="PATCH"
+                                title="Resetar Acesso Admin"
+                                message="A senha do usuario admin desta empresa sera resetada para uma senha temporaria. A nova senha sera exibida na tela."
+                                confirmText="Resetar Senha">
+                                <x-slot name="trigger">
+                                    <button type="button" class="w-full text-center px-4 py-2 bg-amber-50 text-amber-600 rounded-md hover:bg-amber-100 text-sm">
+                                        Resetar Acesso Admin
+                                    </button>
+                                </x-slot>
+                            </x-confirm-modal>
+
+                            <x-confirm-modal
+                                :action="route('empresas.destroy', $empresa)"
+                                title="Remover Empresa"
+                                message="Tem certeza que deseja remover esta empresa? Todos os dados associados serao mantidos mas a empresa ficara inativa."
+                                confirmText="Remover">
+                                <x-slot name="trigger">
+                                    <button type="button" class="w-full text-center px-4 py-2 bg-red-50 text-red-600 rounded-md hover:bg-red-100 text-sm">
+                                        Remover Empresa
+                                    </button>
+                                </x-slot>
+                            </x-confirm-modal>
+                        </div>
+                    </x-clinic-card>
                 </div>
             </div>
         </div>

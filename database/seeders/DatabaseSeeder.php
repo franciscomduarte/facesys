@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Agendamento;
 use App\Models\Empresa;
+use App\Models\Plano;
+use App\Models\Subscription;
 use App\Models\User;
 use App\Models\Patient;
 use App\Models\Procedimento;
@@ -87,6 +89,97 @@ class DatabaseSeeder extends Seeder
             'email' => 'medico@clinicabeleza.com',
             'role' => 'medico',
             'empresa_id' => $empresaBeleza->id,
+        ]);
+
+        // Criar planos
+        $planoStarter = Plano::create([
+            'nome' => 'Starter',
+            'slug' => 'starter',
+            'descricao' => 'Ideal para clinicas iniciantes com ate 3 profissionais.',
+            'valor_mensal' => 99.00,
+            'valor_anual' => 990.00,
+            'periodicidade_padrao' => 'mensal',
+            'limite_usuarios' => 3,
+            'limite_pacientes' => 100,
+            'limite_agendamentos_mes' => 200,
+            'funcionalidades' => [
+                'agendamentos' => true,
+                'prescricoes' => true,
+                'contratos' => false,
+                'fotos_clinicas' => false,
+                'assinatura_digital' => false,
+                'relatorios' => false,
+            ],
+            'trial_dias' => 14,
+            'ativo' => true,
+            'ordem' => 1,
+        ]);
+
+        $planoProfessional = Plano::create([
+            'nome' => 'Professional',
+            'slug' => 'professional',
+            'descricao' => 'Para clinicas em crescimento com recursos completos.',
+            'valor_mensal' => 199.00,
+            'valor_anual' => 1990.00,
+            'periodicidade_padrao' => 'mensal',
+            'limite_usuarios' => 10,
+            'limite_pacientes' => 500,
+            'limite_agendamentos_mes' => 1000,
+            'funcionalidades' => [
+                'agendamentos' => true,
+                'prescricoes' => true,
+                'contratos' => true,
+                'fotos_clinicas' => true,
+                'assinatura_digital' => true,
+                'relatorios' => false,
+            ],
+            'trial_dias' => 14,
+            'ativo' => true,
+            'ordem' => 2,
+        ]);
+
+        $planoEnterprise = Plano::create([
+            'nome' => 'Enterprise',
+            'slug' => 'enterprise',
+            'descricao' => 'Solucao completa e ilimitada para grandes clinicas.',
+            'valor_mensal' => 399.00,
+            'valor_anual' => 3990.00,
+            'periodicidade_padrao' => 'mensal',
+            'limite_usuarios' => -1,
+            'limite_pacientes' => -1,
+            'limite_agendamentos_mes' => -1,
+            'funcionalidades' => [
+                'agendamentos' => true,
+                'prescricoes' => true,
+                'contratos' => true,
+                'fotos_clinicas' => true,
+                'assinatura_digital' => true,
+                'relatorios' => true,
+            ],
+            'trial_dias' => 14,
+            'ativo' => true,
+            'ordem' => 3,
+        ]);
+
+        // Criar subscriptions
+        Subscription::create([
+            'empresa_id' => $empresaLC->id,
+            'plano_id' => $planoProfessional->id,
+            'status' => 'ativa',
+            'periodicidade' => 'mensal',
+            'data_inicio' => now()->subMonths(3),
+            'proxima_cobranca' => now()->addDays(15),
+            'valor_atual' => 199.00,
+        ]);
+
+        Subscription::create([
+            'empresa_id' => $empresaBeleza->id,
+            'plano_id' => $planoStarter->id,
+            'status' => 'ativa',
+            'periodicidade' => 'mensal',
+            'data_inicio' => now()->subMonth(),
+            'proxima_cobranca' => now()->addDays(20),
+            'valor_atual' => 99.00,
         ]);
 
         // Seed para cada empresa
