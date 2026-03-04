@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\CacheService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,12 +18,11 @@ class CheckSubscription
             return $next($request);
         }
 
-        $empresa = $user->empresa;
-        if (!$empresa) {
+        if (!$user->empresa_id) {
             return $next($request);
         }
 
-        $subscription = $empresa->subscription;
+        $subscription = CacheService::subscription($user->empresa_id);
 
         // Sem subscription — bloquear
         if (!$subscription) {

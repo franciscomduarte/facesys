@@ -6,7 +6,7 @@
     </span>
 
     <template x-teleport="body">
-        <div x-show="open" x-transition class="fixed inset-0 z-50 flex items-center justify-center">
+        <div x-show="open" x-cloak x-transition class="fixed inset-0 z-50 flex items-center justify-center">
             <div class="fixed inset-0 bg-black/50" @click="open = false"></div>
             <div class="relative bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $title }}</h3>

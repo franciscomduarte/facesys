@@ -47,7 +47,7 @@
                     @if ($documento->assinaturaPaciente->assinatura_imagem)
                         <div class="mt-3 p-2 bg-gray-50 rounded border max-w-xs">
                             <img src="{{ Storage::disk(config('assinatura.signature_disk'))->url($documento->assinaturaPaciente->assinatura_imagem) }}"
-                                 alt="Assinatura do paciente" class="max-h-24">
+                                 alt="Assinatura do paciente" loading="lazy" decoding="async" class="max-h-24">
                         </div>
                     @endif
                 </div>

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Empresa;
 use App\Models\User;
+use App\Notifications\NovaContaAdmin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -42,6 +44,7 @@ class EmpresaController extends Controller
 
     public function store(Request $request)
     {
+        set_time_limit(60);
         $this->authorize('create', Empresa::class);
 
         $data = $request->validate([
@@ -51,13 +54,34 @@ class EmpresaController extends Controller
             'email' => 'nullable|email|max:255',
             'telefone' => 'nullable|string|max:20',
             'status' => 'required|in:ativa,inativa,suspensa',
+            'admin_name' => 'required|string|max:255',
+            'admin_email' => 'required|email|max:255|unique:users,email',
         ]);
 
-        $empresa = Empresa::create($data);
+        $senhaTemporaria = Str::random(12);
+
+        $empresa = DB::transaction(function () use ($data, $senhaTemporaria) {
+            $empresa = Empresa::create(collect($data)->only([
+                'nome_fantasia', 'razao_social', 'cnpj', 'email', 'telefone', 'status',
+            ])->toArray());
+
+            $admin = User::create([
+                'name' => $data['admin_name'],
+                'email' => $data['admin_email'],
+                'password' => Hash::make($senhaTemporaria),
+                'role' => 'admin',
+                'empresa_id' => $empresa->id,
+                'force_password_change' => true,
+            ]);
+
+            $admin->notify(new NovaContaAdmin($empresa, $senhaTemporaria));
+
+            return $empresa;
+        });
 
         return redirect()
             ->route('empresas.show', $empresa)
-            ->with('success', 'Empresa cadastrada com sucesso.');
+            ->with('success', "Empresa cadastrada com sucesso. Um e-mail com as credenciais foi enviado para {$data['admin_email']}.");
     }
 
     public function show(Empresa $empresa)
@@ -110,6 +134,7 @@ class EmpresaController extends Controller
 
     public function resetAdminAccess(Empresa $empresa)
     {
+        set_time_limit(60);
         $this->authorize('resetAdminAccess', $empresa);
 
         $admin = User::where('empresa_id', $empresa->id)
@@ -123,11 +148,16 @@ class EmpresaController extends Controller
         }
 
         $senhaTemporaria = Str::random(12);
-        $admin->update(['password' => Hash::make($senhaTemporaria)]);
+        $admin->update([
+            'password' => Hash::make($senhaTemporaria),
+            'force_password_change' => true,
+        ]);
+
+        $admin->notify(new NovaContaAdmin($empresa, $senhaTemporaria));
 
         return redirect()
             ->back()
-            ->with('success', "Senha do admin '{$admin->name}' ({$admin->email}) resetada. Senha temporaria: {$senhaTemporaria}");
+            ->with('success', "Senha do admin '{$admin->name}' ({$admin->email}) resetada. Um e-mail com as novas credenciais foi enviado.");
     }
 
     public function toggleStatus(Empresa $empresa)

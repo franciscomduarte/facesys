@@ -46,7 +46,7 @@ class ProcedimentoService
     public function update(Procedimento $procedimento, array $data): Procedimento
     {
         $procedimento->update($data);
-        return $procedimento->fresh();
+        return $procedimento->refresh();
     }
 
     public function delete(Procedimento $procedimento): bool
@@ -57,6 +57,6 @@ class ProcedimentoService
     public function toggleAtivo(Procedimento $procedimento): Procedimento
     {
         $procedimento->update(['ativo' => !$procedimento->ativo]);
-        return $procedimento->fresh();
+        return $procedimento->refresh();
     }
 }

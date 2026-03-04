@@ -49,3 +49,24 @@
         <x-input-error :messages="$errors->get('status')" class="mt-2" />
     </div>
 </x-form-section>
+
+@unless(isset($empresa) && $empresa->exists)
+<x-form-section title="Dados do Administrador">
+    <div>
+        <x-input-label for="admin_name" value="Nome do Administrador *" />
+        <x-text-input id="admin_name" name="admin_name" type="text"
+                      class="mt-1 block w-full" :value="old('admin_name')"
+                      placeholder="Nome completo do admin" required />
+        <x-input-error :messages="$errors->get('admin_name')" class="mt-2" />
+    </div>
+
+    <div>
+        <x-input-label for="admin_email" value="E-mail do Administrador *" />
+        <x-text-input id="admin_email" name="admin_email" type="email"
+                      class="mt-1 block w-full" :value="old('admin_email')"
+                      placeholder="admin@empresa.com" required />
+        <x-input-error :messages="$errors->get('admin_email')" class="mt-2" />
+        <p class="mt-1 text-sm text-gray-500">Uma senha temporaria sera enviada para este e-mail.</p>
+    </div>
+</x-form-section>
+@endunless

@@ -10,8 +10,10 @@ class PatientService
     public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return Patient::query()
+            ->select('id', 'empresa_id', 'nome_completo', 'cpf', 'telefone', 'email', 'created_at')
             ->with(['treatmentSessions' => function ($query) {
-                $query->orderByDesc('data_sessao');
+                $query->select('id', 'patient_id', 'data_sessao')
+                    ->orderByDesc('data_sessao');
             }])
             ->when(isset($filters['search']) && $filters['search'], function ($query) use ($filters) {
                 $search = $filters['search'];
@@ -33,7 +35,7 @@ class PatientService
     public function update(Patient $patient, array $data): Patient
     {
         $patient->update($data);
-        return $patient->fresh();
+        return $patient->refresh();
     }
 
     public function delete(Patient $patient): bool

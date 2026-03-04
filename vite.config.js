@@ -8,4 +8,14 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    build: {
+        sourcemap: false,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['alpinejs', 'axios'],
+                },
+            },
+        },
+    },
 });

@@ -118,13 +118,13 @@ class AgendamentoService
             }
             $agendamento->procedimentos()->sync($syncData);
 
-            $agendamento->load(['patient', 'profissional', 'procedimentos']);
+            $agendamento->refresh()->load(['patient', 'profissional', 'procedimentos']);
 
             if ($dataMudou) {
                 $this->notificacaoService->notificarRemarcacao($agendamento);
             }
 
-            return $agendamento->fresh(['patient', 'profissional', 'procedimentos']);
+            return $agendamento;
         });
     }
 

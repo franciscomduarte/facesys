@@ -112,7 +112,7 @@
                         @if ($documento->assinaturaPaciente->assinatura_imagem)
                             <div class="mt-3 p-2 bg-gray-50 rounded border">
                                 <img src="{{ Storage::disk(config('assinatura.signature_disk'))->url($documento->assinaturaPaciente->assinatura_imagem) }}"
-                                     alt="Assinatura do paciente" class="max-h-20">
+                                     alt="Assinatura do paciente" loading="lazy" decoding="async" class="max-h-20">
                             </div>
                         @endif
                     @else
@@ -133,7 +133,7 @@
                         @if ($documento->assinaturaProfissional->assinatura_imagem)
                             <div class="mt-3 p-2 bg-gray-50 rounded border">
                                 <img src="{{ Storage::disk(config('assinatura.signature_disk'))->url($documento->assinaturaProfissional->assinatura_imagem) }}"
-                                     alt="Assinatura do profissional" class="max-h-20">
+                                     alt="Assinatura do profissional" loading="lazy" decoding="async" class="max-h-20">
                             </div>
                         @endif
                     @else

@@ -32,6 +32,7 @@
                             @foreach($antes as $foto)
                                 <div class="relative group">
                                     <img src="{{ $foto->url }}" alt="Antes - {{ $procedimento->nome }}"
+                                         loading="lazy" decoding="async"
                                          class="h-28 w-full object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition"
                                          @click="lightboxSrc = '{{ $foto->url }}'; lightboxCaption = 'Antes - {{ $procedimento->nome }} ({{ $foto->data_registro->format('d/m/Y') }})'; lightbox = true" />
                                     <span class="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded">Antes</span>
@@ -70,6 +71,7 @@
                             @foreach($depois as $foto)
                                 <div class="relative group">
                                     <img src="{{ $foto->url }}" alt="Depois - {{ $procedimento->nome }}"
+                                         loading="lazy" decoding="async"
                                          class="h-28 w-full object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition"
                                          @click="lightboxSrc = '{{ $foto->url }}'; lightboxCaption = 'Depois - {{ $procedimento->nome }} ({{ $foto->data_registro->format('d/m/Y') }})'; lightbox = true" />
                                     <span class="absolute top-1 left-1 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded">Depois</span>

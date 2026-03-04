@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\CacheService;
 use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
 
@@ -13,7 +14,7 @@ class ActivityLogController extends Controller
             abort(403);
         }
 
-        $query = Activity::with('causer')->orderByDesc('created_at');
+        $query = Activity::with('causer:id,name')->orderByDesc('created_at');
 
         if ($search = $request->input('search')) {
             $query->where('description', 'ilike', "%{$search}%");
@@ -37,10 +38,8 @@ class ActivityLogController extends Controller
 
         $activities = $query->paginate(25)->withQueryString();
 
-        // Subject types disponiveis para filtro
-        $subjectTypes = Activity::distinct()
-            ->whereNotNull('subject_type')
-            ->pluck('subject_type')
+        // Subject types disponiveis para filtro — cacheado por 1 hora
+        $subjectTypes = CacheService::activitySubjectTypes()
             ->map(fn ($type) => [
                 'value' => $type,
                 'label' => class_basename($type),

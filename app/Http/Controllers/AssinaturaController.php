@@ -60,7 +60,11 @@ class AssinaturaController extends Controller
             return view('assinaturas.ja-assinado');
         }
 
-        $documento->load(['documento.items']);
+        $documento->load(['documento']);
+
+        if ($documento->tipo_documento === 'prescricao') {
+            $documento->documento->load('items');
+        }
 
         return view('assinaturas.assinar', compact('documento'));
     }
@@ -92,7 +96,7 @@ class AssinaturaController extends Controller
     {
         $this->authorize('assinarProfissional', $documento);
 
-        $documento->load(['patient', 'profissional', 'documento.items', 'assinaturaPaciente']);
+        $documento->load(['patient', 'profissional', 'documento', 'assinaturaPaciente']);
 
         return view('assinaturas.assinar-profissional', compact('documento'));
     }
@@ -122,7 +126,7 @@ class AssinaturaController extends Controller
     {
         $this->authorize('view', $documento);
 
-        $documento->load(['patient', 'profissional', 'documento.items', 'assinaturaPaciente', 'assinaturaProfissional']);
+        $documento->load(['patient', 'profissional', 'documento', 'assinaturaPaciente', 'assinaturaProfissional']);
 
         return view('assinaturas.show', compact('documento'));
     }

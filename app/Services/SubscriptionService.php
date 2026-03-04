@@ -66,7 +66,7 @@ class SubscriptionService
                 'gateway_subscription_id' => $gatewaySubId,
             ]);
 
-            return $subscription->fresh(['plano', 'empresa']);
+            return $subscription->refresh()->load(['plano', 'empresa']);
         });
     }
 
@@ -82,7 +82,7 @@ class SubscriptionService
             'observacoes' => $motivo,
         ]);
 
-        return $subscription->fresh();
+        return $subscription->refresh();
     }
 
     public function reativar(Subscription $subscription): Subscription
@@ -95,7 +95,7 @@ class SubscriptionService
                 : now()->addMonth()->toDateString(),
         ]);
 
-        return $subscription->fresh();
+        return $subscription->refresh();
     }
 
     public function alterarPlano(Subscription $subscription, Plano $novoPlano): Subscription
@@ -109,14 +109,14 @@ class SubscriptionService
             'valor_atual' => $valor,
         ]);
 
-        return $subscription->fresh(['plano']);
+        return $subscription->refresh()->load(['plano']);
     }
 
     public function marcarInadimplente(Subscription $subscription): Subscription
     {
         $subscription->update(['status' => 'inadimplente']);
 
-        return $subscription->fresh();
+        return $subscription->refresh();
     }
 
     public function marcarPaga(Subscription $subscription): Subscription
@@ -128,7 +128,7 @@ class SubscriptionService
                 : now()->addMonth()->toDateString(),
         ]);
 
-        return $subscription->fresh();
+        return $subscription->refresh();
     }
 
     public function verificarLimite(Empresa $empresa, string $recurso): bool

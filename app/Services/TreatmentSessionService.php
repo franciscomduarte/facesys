@@ -37,7 +37,7 @@ class TreatmentSessionService
 
             $this->syncProcedimentos($session, $procedimentos);
 
-            return $session->fresh(['applicationPoints', 'procedimentos']);
+            return $session->refresh()->load(['applicationPoints', 'procedimentos']);
         });
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\CacheService;
 use App\Services\EmpresaContextService;
 use Closure;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class SetEmpresaContext
                     ->with('error', 'Sua conta nao esta vinculada a nenhuma empresa.');
             }
 
-            $empresa = $user->empresa;
+            $empresa = CacheService::empresa($user->empresa_id);
 
             if (!$empresa || !$empresa->isAtiva()) {
                 Auth::logout();

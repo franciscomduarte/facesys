@@ -41,7 +41,7 @@ class PlanoService
     {
         $plano->update($data);
 
-        return $plano->fresh();
+        return $plano->refresh();
     }
 
     public function delete(Plano $plano): bool
@@ -53,6 +53,6 @@ class PlanoService
     {
         $plano->update(['ativo' => !$plano->ativo]);
 
-        return $plano->fresh();
+        return $plano->refresh();
     }
 }

@@ -17,7 +17,7 @@ class TreatmentSessionController extends Controller
 
     public function create(Patient $patient)
     {
-        $procedimentosAtivos = Procedimento::ativos()->orderBy('categoria')->orderBy('nome')->get();
+        $procedimentosAtivos = Procedimento::ativos()->select('id', 'nome', 'categoria', 'duracao_media_minutos', 'valor_padrao')->orderBy('categoria')->orderBy('nome')->get();
 
         return view('sessions.create', compact('patient', 'procedimentosAtivos'));
     }
@@ -46,7 +46,7 @@ class TreatmentSessionController extends Controller
     public function edit(Patient $patient, TreatmentSession $session)
     {
         $session->load('applicationPoints', 'procedimentos');
-        $procedimentosAtivos = Procedimento::ativos()->orderBy('categoria')->orderBy('nome')->get();
+        $procedimentosAtivos = Procedimento::ativos()->select('id', 'nome', 'categoria', 'duracao_media_minutos', 'valor_padrao')->orderBy('categoria')->orderBy('nome')->get();
 
         return view('sessions.edit', compact('patient', 'session', 'procedimentosAtivos'));
     }

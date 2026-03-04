@@ -30,7 +30,7 @@ class AgendamentoController extends Controller
 
         $agendamentosSemana = $this->agendamentoService->getByWeek($dataBase, $profissionalId);
 
-        $profissionais = User::whereIn('role', ['admin', 'medico'])->orderBy('name')->get();
+        $profissionais = User::select('id', 'name')->whereIn('role', ['admin', 'medico'])->orderBy('name')->get();
 
         $dias = [];
         for ($i = 0; $i < 6; $i++) {
@@ -51,7 +51,7 @@ class AgendamentoController extends Controller
     {
         $patients = Patient::orderBy('nome_completo')->get(['id', 'nome_completo']);
         $profissionais = User::whereIn('role', ['admin', 'medico'])->orderBy('name')->get(['id', 'name']);
-        $procedimentosAtivos = Procedimento::ativos()->orderBy('categoria')->orderBy('nome')->get();
+        $procedimentosAtivos = Procedimento::ativos()->select('id', 'nome', 'categoria', 'duracao_media_minutos', 'valor_padrao')->orderBy('categoria')->orderBy('nome')->get();
 
         return view('agendamentos.create', compact('patients', 'profissionais', 'procedimentosAtivos'));
     }
@@ -96,7 +96,7 @@ class AgendamentoController extends Controller
         $agendamento->load(['patient', 'profissional', 'procedimentos']);
         $patients = Patient::orderBy('nome_completo')->get(['id', 'nome_completo']);
         $profissionais = User::whereIn('role', ['admin', 'medico'])->orderBy('name')->get(['id', 'name']);
-        $procedimentosAtivos = Procedimento::ativos()->orderBy('categoria')->orderBy('nome')->get();
+        $procedimentosAtivos = Procedimento::ativos()->select('id', 'nome', 'categoria', 'duracao_media_minutos', 'valor_padrao')->orderBy('categoria')->orderBy('nome')->get();
 
         return view('agendamentos.edit', compact('agendamento', 'patients', 'profissionais', 'procedimentosAtivos'));
     }
