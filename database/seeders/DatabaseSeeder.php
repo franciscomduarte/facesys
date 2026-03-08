@@ -182,6 +182,9 @@ class DatabaseSeeder extends Seeder
             'valor_atual' => 99.00,
         ]);
 
+        // Seed billing (modules, features, plan relationships)
+        $this->call(BillingSeeder::class);
+
         // Seed para cada empresa
         $this->seedEmpresaData($empresaLC, $adminLC, $medicoLC);
         $this->seedEmpresaData($empresaBeleza, $adminBeleza, $medicoBeleza);

@@ -8,6 +8,7 @@ use App\Models\Subscription;
 use App\Observers\EmpresaObserver;
 use App\Observers\SubscriptionObserver;
 use App\Services\EmpresaContextService;
+use App\Services\Gateways\AsaasGateway;
 use App\Services\Gateways\ManualGateway;
 use Illuminate\Support\ServiceProvider;
 
@@ -19,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(PaymentGatewayInterface::class, function () {
             return match (config('billing.gateway')) {
+                'asaas' => new AsaasGateway(),
                 default => new ManualGateway(),
             };
         });

@@ -83,28 +83,6 @@
             <x-input-error :messages="$errors->get('tipo_atendimento')" class="mt-2" />
         </div>
 
-        {{-- Horario --}}
-        <div>
-            <x-input-label for="hora_inicio" value="Horario *" />
-            <select id="hora_inicio" name="hora_inicio" x-model="horaInicio" required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    :disabled="!horariosDisponiveis.length && !horaInicio">
-                <option value="">Selecione data e profissional primeiro...</option>
-                <template x-for="slot in horariosDisponiveis" :key="slot">
-                    <option :value="slot" x-text="slot" :selected="slot === horaInicio"></option>
-                </template>
-                {{-- Manter hora atual em edicao mesmo que nao esteja nos slots --}}
-                <template x-if="horaInicio && !horariosDisponiveis.includes(horaInicio)">
-                    <option :value="horaInicio" x-text="horaInicio + ' (atual)'" selected></option>
-                </template>
-            </select>
-            <p class="mt-1 text-xs text-gray-500">
-                <span x-show="loading" class="text-indigo-600">Buscando horarios...</span>
-                <span x-show="!loading && duracaoTotal > 0" x-text="'Duracao estimada: ' + duracaoTotal + ' min'"></span>
-            </p>
-            <x-input-error :messages="$errors->get('hora_inicio')" class="mt-2" />
-        </div>
-
         {{-- Observacoes --}}
         <div class="md:col-span-2">
             <x-input-label for="observacoes" value="Observacoes" />
@@ -176,6 +154,44 @@
             Nenhum procedimento selecionado.
         </div>
         <x-input-error :messages="$errors->get('procedimentos_selecionados')" class="mt-2" />
+    </div>
+
+    {{-- Horario (após procedimentos para calcular duracao correta) --}}
+    <div class="mb-6">
+        <h4 class="text-md font-semibold text-gray-700 border-b border-gray-200 pb-2 mb-4">Horario *</h4>
+        <div class="max-w-md">
+            <select id="hora_inicio" name="hora_inicio" x-model="horaInicio" required
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    :disabled="!horariosDisponiveis.length && !horaInicio">
+                <template x-if="selected.length === 0">
+                    <option value="">Adicione procedimentos primeiro...</option>
+                </template>
+                <template x-if="selected.length > 0 && (!dataAgendamento || !profissionalId)">
+                    <option value="">Selecione data e profissional...</option>
+                </template>
+                <template x-if="selected.length > 0 && dataAgendamento && profissionalId && !horariosDisponiveis.length && !loading">
+                    <option value="">Nenhum horario disponivel</option>
+                </template>
+                <template x-if="loading">
+                    <option value="">Buscando horarios...</option>
+                </template>
+                <template x-if="horariosDisponiveis.length > 0 && !loading">
+                    <option value="">Selecione um horario...</option>
+                </template>
+                <template x-for="slot in horariosDisponiveis" :key="slot.hora_inicio">
+                    <option :value="slot.hora_inicio" x-text="slot.label" :selected="slot.hora_inicio === horaInicio"></option>
+                </template>
+                {{-- Manter hora atual em edicao mesmo que nao esteja nos slots --}}
+                <template x-if="horaInicio && !horariosDisponiveis.some(s => s.hora_inicio === horaInicio)">
+                    <option :value="horaInicio" x-text="horaInicio + ' (atual)'" selected></option>
+                </template>
+            </select>
+            <p class="mt-1 text-xs text-gray-500">
+                <span x-show="loading" class="text-indigo-600">Buscando horarios disponiveis...</span>
+                <span x-show="!loading && duracaoTotal > 0" x-text="'Duracao estimada: ' + duracaoTotal + ' min'"></span>
+            </p>
+            <x-input-error :messages="$errors->get('hora_inicio')" class="mt-2" />
+        </div>
     </div>
 </div>
 

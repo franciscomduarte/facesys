@@ -7,12 +7,22 @@ use App\Models\Patient;
 use App\Models\TreatmentSession;
 use App\Services\FotoClinicaService;
 use App\Http\Requests\StoreFotoClinicaRequest;
+use Illuminate\Support\Facades\Storage;
 
 class FotoClinicaController extends Controller
 {
     public function __construct(
         private FotoClinicaService $fotoService
     ) {}
+
+    public function show(Patient $patient, TreatmentSession $session, FotoClinica $foto)
+    {
+        if (!Storage::disk('local')->exists($foto->caminho_arquivo)) {
+            abort(404);
+        }
+
+        return Storage::disk('local')->response($foto->caminho_arquivo);
+    }
 
     public function store(StoreFotoClinicaRequest $request, Patient $patient, TreatmentSession $session)
     {

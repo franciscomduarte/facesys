@@ -8,6 +8,7 @@ use App\Http\Controllers\ContratoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\FotoClinicaController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PlanoController;
 use App\Http\Controllers\PrescricaoController;
@@ -18,9 +19,13 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+// Rotas publicas (Landing Page)
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/planos', [LandingController::class, 'planos'])->name('landing.planos');
+Route::get('/contato', [LandingController::class, 'contato'])->name('landing.contato');
+Route::get('/demo', [LandingController::class, 'demo'])->name('landing.demo');
+Route::get('/termos-de-uso', [LandingController::class, 'termos'])->name('landing.termos');
+Route::get('/politica-de-privacidade', [LandingController::class, 'privacidade'])->name('landing.privacidade');
 
 // Rotas publicas de assinatura (sem auth)
 Route::get('assinar/{token}', [AssinaturaController::class, 'assinarPaciente'])->name('assinatura.paciente');
@@ -46,6 +51,8 @@ Route::middleware('auth')->group(function () {
         ->parameters(['sessions' => 'session']);
 
     // Fotos Clinicas (nested sob sessions)
+    Route::get('patients/{patient}/sessions/{session}/fotos/{foto}', [FotoClinicaController::class, 'show'])
+        ->name('patients.sessions.fotos.show');
     Route::post('patients/{patient}/sessions/{session}/fotos', [FotoClinicaController::class, 'store'])
         ->name('patients.sessions.fotos.store');
     Route::delete('patients/{patient}/sessions/{session}/fotos/{foto}', [FotoClinicaController::class, 'destroy'])
@@ -146,8 +153,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('subscriptions/{subscription}/alterar-plano', [SubscriptionController::class, 'alterarPlano'])
         ->name('subscriptions.alterar-plano');
 
-    // Meu Plano (Empresa)
+    // Billing (Empresa)
     Route::get('meu-plano', [BillingController::class, 'show'])->name('billing.show');
+    Route::get('planos-assinatura', [BillingController::class, 'plans'])->name('billing.plans');
+    Route::get('checkout/{plano}', [BillingController::class, 'checkout'])->name('billing.checkout');
+    Route::post('billing/pix', [BillingController::class, 'createPixPayment'])->name('billing.pix');
+    Route::post('billing/card', [BillingController::class, 'createCardPayment'])->name('billing.card');
+    Route::delete('billing/cancel', [BillingController::class, 'cancelSubscription'])->name('billing.cancel');
+    Route::post('billing/change-plan', [BillingController::class, 'changePlan'])->name('billing.change-plan');
 });
 
 require __DIR__.'/auth.php';

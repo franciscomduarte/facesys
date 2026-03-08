@@ -14,4 +14,10 @@ interface PaymentGatewayInterface
     public function cancelSubscription(string $gatewaySubscriptionId): bool;
 
     public function getSubscriptionStatus(string $gatewaySubscriptionId): string;
+
+    public function createPixPayment(Subscription $subscription, float $amount): array;
+
+    public function createCardPayment(Subscription $subscription, float $amount, array $cardData): array;
+
+    public function verifyWebhookSignature(string $payload, string $signature): bool;
 }

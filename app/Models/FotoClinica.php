@@ -71,7 +71,11 @@ class FotoClinica extends Model
 
     public function getUrlAttribute(): string
     {
-        return Storage::disk('local')->url($this->caminho_arquivo);
+        return route('patients.sessions.fotos.show', [
+            'patient' => $this->patient_id,
+            'session' => $this->treatment_session_id,
+            'foto' => $this->id,
+        ]);
     }
 
     public function getTamanhoFormatadoAttribute(): string

@@ -22,6 +22,11 @@ class CheckSubscription
             return $next($request);
         }
 
+        // Allow billing routes so users can manage/purchase plans
+        if ($request->routeIs('billing.*')) {
+            return $next($request);
+        }
+
         $subscription = CacheService::subscription($user->empresa_id);
 
         // Sem subscription — bloquear
@@ -53,6 +58,6 @@ class CheckSubscription
             return response()->json(['error' => $mensagem], 403);
         }
 
-        return redirect()->route('dashboard')->with('error', $mensagem);
+        return redirect()->route('billing.show')->with('error', $mensagem);
     }
 }

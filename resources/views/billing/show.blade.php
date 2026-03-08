@@ -11,6 +11,18 @@
                 </div>
             @endif
 
+            @if(session('success'))
+                <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('info'))
+                <div class="mb-4 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg">
+                    {{ session('info') }}
+                </div>
+            @endif
+
             @if(!$subscription)
                 <x-clinic-card>
                     <div class="text-center py-8">
@@ -18,7 +30,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum plano ativo</h3>
-                        <p class="text-gray-500">Sua empresa nao possui um plano ativo. Entre em contato com o suporte para ativar um plano.</p>
+                        <p class="text-gray-500 mb-4">Sua empresa nao possui um plano ativo.</p>
+                        <a href="{{ route('billing.plans') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition">
+                            Ver planos disponiveis
+                        </a>
                     </div>
                 </x-clinic-card>
             @else
@@ -118,6 +133,79 @@
                                     <span class="text-sm {{ $plano->temFuncionalidade($key) ? 'text-green-800' : 'text-gray-500' }}">{{ $label }}</span>
                                 </div>
                             @endforeach
+                        </div>
+                    </x-clinic-card>
+
+                    {{-- Historico de pagamentos --}}
+                    @if($payments->isNotEmpty())
+                        <x-clinic-card title="Historico de Pagamentos">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="text-left text-gray-500 border-b">
+                                            <th class="pb-2 font-medium">Data</th>
+                                            <th class="pb-2 font-medium">Valor</th>
+                                            <th class="pb-2 font-medium">Metodo</th>
+                                            <th class="pb-2 font-medium">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        @foreach($payments as $payment)
+                                            <tr>
+                                                <td class="py-2 text-gray-700">{{ $payment->created_at->format('d/m/Y') }}</td>
+                                                <td class="py-2 text-gray-700">{{ $payment->amount_formatado }}</td>
+                                                <td class="py-2 text-gray-700">{{ $payment->method === 'pix' ? 'PIX' : 'Cartao' }}</td>
+                                                <td class="py-2">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                                                        {{ $payment->isPaid() ? 'bg-green-100 text-green-800' : '' }}
+                                                        {{ $payment->isPending() ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                                        {{ $payment->isFailed() ? 'bg-red-100 text-red-800' : '' }}
+                                                        {{ $payment->isRefunded() ? 'bg-gray-100 text-gray-800' : '' }}">
+                                                        {{ ucfirst($payment->status) }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </x-clinic-card>
+                    @endif
+
+                    {{-- Acoes --}}
+                    <x-clinic-card title="Gerenciar Plano">
+                        <div class="flex flex-wrap gap-3">
+                            @if($planos->where('id', '!=', $plano->id)->isNotEmpty())
+                                <a href="{{ route('billing.plans') }}"
+                                   class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
+                                    Trocar plano
+                                </a>
+                            @endif
+
+                            @if($subscription->isAtiva() || $subscription->isTrial())
+                                <div x-data="{ showCancel: false }">
+                                    <button @click="showCancel = true"
+                                            class="inline-flex items-center px-4 py-2 bg-white border border-red-300 text-red-700 rounded-lg text-sm font-medium hover:bg-red-50 transition">
+                                        Cancelar assinatura
+                                    </button>
+
+                                    <div x-show="showCancel" x-cloak class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                                        <p class="text-sm text-red-700 mb-3">Tem certeza? Voce perdera acesso ao final do periodo pago.</p>
+                                        <form action="{{ route('billing.cancel') }}" method="POST" class="flex items-center gap-2">
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="text" name="motivo" placeholder="Motivo (opcional)"
+                                                   class="flex-1 rounded-lg border-gray-300 text-sm">
+                                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700">
+                                                Confirmar cancelamento
+                                            </button>
+                                            <button type="button" @click="showCancel = false" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm">
+                                                Voltar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </x-clinic-card>
                 </div>
